@@ -16,7 +16,7 @@ class HomeView extends GetView<HomeController> {
         child: Stack(
           children: [
             Positioned(
-              top: Get.height * 0.10, // 5% of height
+              top: Get.height * 0.10, // 10% of height
               child: Container(
                   width: MediaQuery.of(context).size.width,
                   child: Column(
@@ -50,18 +50,24 @@ class HomeView extends GetView<HomeController> {
                 global: false,
                 builder: (HomeController controller) {
                   return Positioned(
-                    top: Get.height * 0.16, // 10% of height
+                    top: Get.height * 0.16, // 16% of height
                     child: Container(
-                      height: Get.height * 0.60, // 58.5% of height
+                      height: Get.height * 0.60, // 60.0% of height
                       width: MediaQuery.of(context).size.width,
                       child: controller.image == null
-                          ? Container(
-                              child: Text("Loading..."),
+                          ? Center(
+                              child: Container(
+                                child: Text("Loading..."),
+                              ),
                             )
-                          : CustomPaint(
-                              size: Size.infinite,
-                              painter: TopHeaderLinePainter(
-                                image: controller.image!,
+                          : GestureDetector(
+                              onTap: controller.changeImage,
+                              child: CustomPaint(
+                                size: Size.infinite,
+                                painter: JugglingCustomPainter(
+                                  image: controller.image!,
+                                  color: controller.defaultPaintColor,
+                                ),
                               ),
                             ),
                     ),
@@ -120,82 +126,6 @@ class HomeView extends GetView<HomeController> {
                     ],
                   )),
             ),
-
-            // draw : bottom score line
-            // Positioned(
-            //   bottom: Get.height * 0.15, // 10% of height
-            //   child: Container(
-            //     width: MediaQuery.of(context).size.width,
-            //     child: Container(
-            //       // height: 70,
-            //       // color: Color.fromARGB(255, 33, 183, 28),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.center,
-            //         crossAxisAlignment: CrossAxisAlignment.center,
-            //         mainAxisSize: MainAxisSize.min,
-            //         children: [
-            //           // Left Image
-            //           Padding(
-            //             padding: EdgeInsets.only(right: Get.width * 0.12),
-            //             child: ClipRRect(
-            //               borderRadius: BorderRadius.only(
-            //                 topRight: Radius.circular(20),
-            //               ),
-            //               child: Image.network(
-            //                 "https://images.unsplash.com/photo-1521851562770-de70f34424b7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8Y2hpbGQlMjBpbiUyMHdhdGVyJTIwc3dpbW1pbmd8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-            //                 fit: BoxFit.cover,
-            //                 height: 70,
-            //                 width: Get.width * 0.14,
-            //               ),
-            //             ),
-            //           ),
-            //           Spacer(),
-            //           Text(
-            //             "13",
-            //             style: TextStyle(
-            //               color: Colors.white,
-            //               fontSize: 35,
-            //               fontWeight: FontWeight.bold,
-            //             ),
-            //           ),
-            //           SizedBox(width: Get.width * 0.12),
-            //           Text(
-            //             "Juggles",
-            //             style: TextStyle(
-            //               color: Colors.white,
-            //               fontSize: 14,
-            //             ),
-            //           ),
-            //           SizedBox(width: Get.width * 0.12),
-            //           Text(
-            //             "5",
-            //             style: TextStyle(
-            //               color: Colors.white,
-            //               fontSize: 35,
-            //               fontWeight: FontWeight.bold,
-            //             ),
-            //           ),
-            //           Spacer(),
-            //           // Right Image
-            //           Padding(
-            //             padding: EdgeInsets.only(left: Get.width * 0.12),
-            //             child: ClipRRect(
-            //               borderRadius: BorderRadius.only(
-            //                 topLeft: Radius.circular(20),
-            //               ),
-            //               child: Image.network(
-            //                 "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHNob2VzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
-            //                 fit: BoxFit.cover,
-            //                 height: 70,
-            //                 width: Get.width * 0.14,
-            //               ),
-            //             ),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -203,26 +133,27 @@ class HomeView extends GetView<HomeController> {
   }
 }
 
-class TopHeaderLinePainter extends CustomPainter {
+class JugglingCustomPainter extends CustomPainter {
   final ui.Image? image;
-  TopHeaderLinePainter({this.image});
+  final Color? color;
+  JugglingCustomPainter({this.image, this.color = Colors.red});
   @override
   void paint(Canvas canvas, Size size) {
-    // paint for header
-    final paint = Paint()
-      ..color = Colors.red[900]!
+    // paint for top line
+    final topPaint = Paint()
+      ..color = color!
       ..strokeWidth = 15
       ..style = PaintingStyle.stroke;
 
     // bottom line paint : will draw bottom line with triangle shape in middle
     final bottomPaint = Paint()
-      ..color = Colors.red[900]!
+      ..color = color!
       ..strokeWidth = 10
       ..style = PaintingStyle.stroke;
 
     // squarePaint : will draw left and right square box
     final squarePaint = Paint()
-      ..color = Colors.red[900]!
+      ..color = color!
       ..style = PaintingStyle.fill;
 
     // path for left and right square box
@@ -252,24 +183,6 @@ class TopHeaderLinePainter extends CustomPainter {
     canvas.drawPath(squarePath, squarePaint);
 
     // Draw Score Text
-    final textSpan = TextSpan(
-      children: [
-        TextSpan(
-          text: '13',
-          style: TextStyle(
-              fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        TextSpan(
-          text: 'juggles',
-          style: TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        TextSpan(
-          text: '5',
-          style: TextStyle(
-              fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
     final textSpan1 = TextSpan(
       text: '13',
       style: TextStyle(
@@ -324,8 +237,13 @@ class TopHeaderLinePainter extends CustomPainter {
       Offset(0, 0),
     ];
 
+    // path for top line
     final path = Path()..addPolygon(points, false);
-    canvas.drawPath(path, paint);
+    canvas.drawPath(path, topPaint);
+
+    /**
+     *  Draw Image in our custom shape
+     */
 
     // Create a new path to use as the clipping area
     Path clipPath = Path()..addPath(path, Offset(0, 0));
@@ -352,7 +270,7 @@ class TopHeaderLinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 class BottomScorePainter extends CustomPainter {
