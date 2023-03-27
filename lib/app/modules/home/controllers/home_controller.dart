@@ -1,12 +1,26 @@
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'dart:ui' as ui;
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
+  ui.Image? image;
 
-  final count = 0.obs;
   @override
-  void onInit() {
+  Future<void> onInit() async {
+    await loadImage('assets/images/juggling_image.jpg');
     super.onInit();
+  }
+
+  Future<void> loadImage(String path) async {
+    final data = await rootBundle.load(path);
+    final bytes = data.buffer.asUint8List();
+    final image = await decodeImageFromList(bytes);
+    this.image = image;
+    log('image loaded: ${image.width}x${image.height}');
+    update(['image'], true);
   }
 
   @override
@@ -18,6 +32,4 @@ class HomeController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
-  void increment() => count.value++;
 }
